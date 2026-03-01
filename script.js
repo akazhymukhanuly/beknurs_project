@@ -1,5 +1,5 @@
 (function () {
-  var STORAGE_KEY = "grandpa-landing-editor-v3";
+  var STORAGE_KEY = "grandpa-landing-editor-v4";
   var GITHUB_SETTINGS_KEY = "grandpa-landing-github-settings-v1";
   var DEFAULT_GITHUB_CONFIG = {
     owner: "akazhymukhanuly",
@@ -592,6 +592,7 @@
   setEditMode(false);
   setSettingsOpen(false);
   renderLanguage(currentLanguage);
+  loadContentFromLocalFile(false);
 
   function renderLanguage(language) {
     document.documentElement.lang = language === "kz" ? "kk" : "ru";
@@ -646,6 +647,15 @@
 
   function translate(key, language) {
     var nextLanguage = language || currentLanguage;
+    if (
+      state &&
+      state.texts &&
+      state.texts[nextLanguage] &&
+      Object.prototype.hasOwnProperty.call(state.texts[nextLanguage], key)
+    ) {
+      return state.texts[nextLanguage][key];
+    }
+
     if (translations[nextLanguage] && Object.prototype.hasOwnProperty.call(translations[nextLanguage], key)) {
       return translations[nextLanguage][key];
     }
