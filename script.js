@@ -1,5 +1,5 @@
 (function () {
-  var STORAGE_KEY = "grandpa-landing-editor-v2";
+  var STORAGE_KEY = "grandpa-landing-editor-v3";
   var GITHUB_SETTINGS_KEY = "grandpa-landing-github-settings-v1";
   var DEFAULT_GITHUB_CONFIG = {
     owner: "akazhymukhanuly",
@@ -592,7 +592,6 @@
   setEditMode(false);
   setSettingsOpen(false);
   renderLanguage(currentLanguage);
-  loadContentFromGitHub(false);
 
   function renderLanguage(language) {
     document.documentElement.lang = language === "kz" ? "kk" : "ru";
