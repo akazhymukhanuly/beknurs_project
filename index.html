@@ -86,6 +86,42 @@
       <p class="editor-hint" data-i18n="editorHint">
         В режиме редактирования можно менять текст прямо на странице. Для замены фото нажмите на нужное изображение.
       </p>
+      <div class="editor-github">
+        <p class="editor-subtitle" data-i18n="githubSectionTitle">Сохранение в GitHub</p>
+        <div class="editor-fields">
+          <label class="editor-field">
+            <span data-i18n="githubOwnerLabel">Владелец</span>
+            <input class="editor-input" type="text" id="github-owner" value="akazhymukhanuly" autocomplete="off">
+          </label>
+          <label class="editor-field">
+            <span data-i18n="githubRepoLabel">Репозиторий</span>
+            <input class="editor-input" type="text" id="github-repo" value="bikon_project" autocomplete="off">
+          </label>
+          <label class="editor-field">
+            <span data-i18n="githubBranchLabel">Ветка</span>
+            <input class="editor-input" type="text" id="github-branch" value="main" autocomplete="off">
+          </label>
+          <label class="editor-field">
+            <span data-i18n="githubPathLabel">Файл</span>
+            <input class="editor-input" type="text" id="github-path" value="content.json" autocomplete="off">
+          </label>
+          <label class="editor-field editor-field-full">
+            <span data-i18n="githubTokenLabel">GitHub token</span>
+            <input class="editor-input" type="password" id="github-token" autocomplete="off" placeholder="ghp_...">
+          </label>
+        </div>
+        <div class="editor-toolbar__actions editor-toolbar__actions-compact">
+          <button class="editor-button" type="button" id="load-github" data-i18n="githubLoad">
+            Загрузить из GitHub
+          </button>
+          <button class="editor-button editor-button-primary" type="button" id="save-github" data-i18n="githubSave">
+            Сохранить в GitHub
+          </button>
+        </div>
+        <p class="editor-note" data-i18n="githubTokenHelp">
+          Токен нужен только для записи в репозиторий. Он хранится локально в вашем браузере на этом устройстве.
+        </p>
+      </div>
       <input type="file" id="image-upload" accept="image/*" hidden>
       <input type="file" id="content-import" accept="application/json" hidden>
     </aside>

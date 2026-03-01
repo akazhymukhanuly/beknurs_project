@@ -1,5 +1,13 @@
 (function () {
   var STORAGE_KEY = "grandpa-landing-editor-v2";
+  var GITHUB_SETTINGS_KEY = "grandpa-landing-github-settings-v1";
+  var DEFAULT_GITHUB_CONFIG = {
+    owner: "akazhymukhanuly",
+    repo: "bikon_project",
+    branch: "main",
+    path: "content.json",
+    token: ""
+  };
   var DEFAULT_LANGUAGE = "ru";
   var TEXT_SELECTOR = "h1, h2, h3, p, dt, dd, figcaption, .portrait-note span, .portrait-note strong";
   var IMAGE_SELECTOR = "main img";
@@ -25,6 +33,15 @@
       editorHint: "В режиме редактирования можно менять текст прямо на странице. Для замены фото нажмите на нужное изображение.",
       editorToggleOn: "Включить редактирование",
       editorToggleOff: "Выключить редактирование",
+      githubSectionTitle: "Сохранение в GitHub",
+      githubOwnerLabel: "Владелец",
+      githubRepoLabel: "Репозиторий",
+      githubBranchLabel: "Ветка",
+      githubPathLabel: "Файл",
+      githubTokenLabel: "GitHub token",
+      githubLoad: "Загрузить из GitHub",
+      githubSave: "Сохранить в GitHub",
+      githubTokenHelp: "Токен нужен только для записи в репозиторий. Он хранится локально в вашем браузере на этом устройстве.",
       statusView: "Режим просмотра",
       statusEditing: "Режим редактирования включен",
       statusSaved: "Изменения сохранены в браузере",
@@ -34,6 +51,13 @@
       statusImageError: "Не удалось загрузить изображение",
       statusImageUpdated: "Фото обновлено",
       statusReset: "Все изменения сброшены",
+      statusRepoLoading: "Загрузка данных из GitHub",
+      statusRepoLoaded: "Данные загружены из GitHub",
+      statusRepoLoadError: "Не удалось загрузить данные из GitHub",
+      statusRepoSaving: "Сохранение в GitHub",
+      statusRepoSaved: "Изменения записаны в репозиторий",
+      statusRepoSaveError: "Не удалось сохранить изменения в GitHub",
+      statusTokenMissing: "Нужен GitHub token для записи в репозиторий",
       statusStorageError: "Браузер не дал сохранить изменения локально",
       resetConfirm: "Сбросить все локальные изменения на этой странице?",
       heroEyebrow: "Памяти человека, чья история сохранилась в документах и в семье",
@@ -122,6 +146,15 @@
       editorHint: "Өңдеу режимінде мәтінді тікелей бетте өзгертуге болады. Фотосуретті ауыстыру үшін қажетті суретті басыңыз.",
       editorToggleOn: "Өңдеуді қосу",
       editorToggleOff: "Өңдеуді өшіру",
+      githubSectionTitle: "GitHub-қа сақтау",
+      githubOwnerLabel: "Иесі",
+      githubRepoLabel: "Репозиторий",
+      githubBranchLabel: "Бұтақ",
+      githubPathLabel: "Файл",
+      githubTokenLabel: "GitHub token",
+      githubLoad: "GitHub-тан жүктеу",
+      githubSave: "GitHub-қа сақтау",
+      githubTokenHelp: "Токен тек репозиторийге жазу үшін керек. Ол осы құрылғыдағы браузерде жергілікті сақталады.",
       statusView: "Қарау режимі",
       statusEditing: "Өңдеу режимі қосылды",
       statusSaved: "Өзгерістер браузерде сақталды",
@@ -131,6 +164,13 @@
       statusImageError: "Суретті жүктеу мүмкін болмады",
       statusImageUpdated: "Фото жаңартылды",
       statusReset: "Барлық өзгеріс өшірілді",
+      statusRepoLoading: "GitHub-тан деректер жүктелуде",
+      statusRepoLoaded: "Деректер GitHub-тан жүктелді",
+      statusRepoLoadError: "GitHub-тан деректерді жүктеу мүмкін болмады",
+      statusRepoSaving: "GitHub-қа сақтау жүріп жатыр",
+      statusRepoSaved: "Өзгерістер репозиторийге жазылды",
+      statusRepoSaveError: "GitHub-қа сақтау мүмкін болмады",
+      statusTokenMissing: "Репозиторийге жазу үшін GitHub token керек",
       statusStorageError: "Браузер өзгерістерді жергілікті сақтай алмады",
       resetConfirm: "Осы беттегі барлық жергілікті өзгерістерді өшіру керек пе?",
       heroEyebrow: "Құжаттар мен отбасы жадында сақталған адамның рухына арналады",
@@ -207,20 +247,47 @@
   var exportButton = document.getElementById("export-content");
   var importButton = document.getElementById("import-content");
   var resetButton = document.getElementById("reset-content");
+  var loadGitHubButton = document.getElementById("load-github");
+  var saveGitHubButton = document.getElementById("save-github");
   var statusNode = document.getElementById("editor-status");
   var imageUpload = document.getElementById("image-upload");
   var importInput = document.getElementById("content-import");
   var languageButtons = Array.from(document.querySelectorAll("[data-lang-switch]"));
+  var githubOwnerInput = document.getElementById("github-owner");
+  var githubRepoInput = document.getElementById("github-repo");
+  var githubBranchInput = document.getElementById("github-branch");
+  var githubPathInput = document.getElementById("github-path");
+  var githubTokenInput = document.getElementById("github-token");
 
-  if (!settingsToggle || !settingsPanel || !settingsClose || !toggleButton || !statusNode || !imageUpload || !importInput) {
+  if (
+    !settingsToggle ||
+    !settingsPanel ||
+    !settingsClose ||
+    !toggleButton ||
+    !exportButton ||
+    !importButton ||
+    !resetButton ||
+    !loadGitHubButton ||
+    !saveGitHubButton ||
+    !statusNode ||
+    !imageUpload ||
+    !importInput ||
+    !githubOwnerInput ||
+    !githubRepoInput ||
+    !githubBranchInput ||
+    !githubPathInput ||
+    !githubTokenInput
+  ) {
     return;
   }
 
   var isEditMode = false;
   var activeImage = null;
+  var contentSha = "";
   var statusKey = "statusView";
   var state = loadState();
   var currentLanguage = state.language;
+  var githubConfig = loadGitHubConfig();
   var translatableNodes = Array.from(document.querySelectorAll("[data-i18n]"));
   var translatableAttrNodes = Array.from(document.querySelectorAll("[data-i18n-attrs]"));
   var editableTexts = Array.from(document.querySelectorAll(TEXT_SELECTOR)).filter(function (node) {
@@ -243,6 +310,8 @@
     node.dataset.originalSrc = node.getAttribute("src") || "";
     node.setAttribute("data-editor-image", "true");
   });
+
+  fillGitHubInputs();
 
   settingsToggle.addEventListener("click", function () {
     setSettingsOpen(settingsPanel.hidden);
@@ -273,6 +342,28 @@
 
   importButton.addEventListener("click", function () {
     importInput.click();
+  });
+
+  loadGitHubButton.addEventListener("click", function () {
+    syncGitHubConfigFromInputs();
+    loadContentFromGitHub(true);
+  });
+
+  saveGitHubButton.addEventListener("click", function () {
+    syncGitHubConfigFromInputs();
+    saveContentToGitHub();
+  });
+
+  [
+    githubOwnerInput,
+    githubRepoInput,
+    githubBranchInput,
+    githubPathInput,
+    githubTokenInput
+  ].forEach(function (input) {
+    input.addEventListener("input", function () {
+      syncGitHubConfigFromInputs();
+    });
   });
 
   importInput.addEventListener("change", function (event) {
@@ -385,6 +476,7 @@
   setEditMode(false);
   setSettingsOpen(false);
   renderLanguage(currentLanguage);
+  loadContentFromGitHub(false);
 
   function renderLanguage(language) {
     document.documentElement.lang = language === "kz" ? "kk" : "ru";
@@ -493,6 +585,239 @@
 
     state.language = currentLanguage;
     saveState(state);
+  }
+
+  function fillGitHubInputs() {
+    githubOwnerInput.value = githubConfig.owner;
+    githubRepoInput.value = githubConfig.repo;
+    githubBranchInput.value = githubConfig.branch;
+    githubPathInput.value = githubConfig.path;
+    githubTokenInput.value = githubConfig.token;
+  }
+
+  function syncGitHubConfigFromInputs() {
+    githubConfig = {
+      owner: githubOwnerInput.value.trim() || DEFAULT_GITHUB_CONFIG.owner,
+      repo: githubRepoInput.value.trim() || DEFAULT_GITHUB_CONFIG.repo,
+      branch: githubBranchInput.value.trim() || DEFAULT_GITHUB_CONFIG.branch,
+      path: githubPathInput.value.trim() || DEFAULT_GITHUB_CONFIG.path,
+      token: githubTokenInput.value.trim()
+    };
+    saveGitHubConfig(githubConfig);
+  }
+
+  function loadGitHubConfig() {
+    try {
+      var raw = window.localStorage.getItem(GITHUB_SETTINGS_KEY);
+      if (!raw) {
+        return Object.assign({}, DEFAULT_GITHUB_CONFIG);
+      }
+
+      var parsed = JSON.parse(raw);
+      return {
+        owner: parsed && parsed.owner ? parsed.owner : DEFAULT_GITHUB_CONFIG.owner,
+        repo: parsed && parsed.repo ? parsed.repo : DEFAULT_GITHUB_CONFIG.repo,
+        branch: parsed && parsed.branch ? parsed.branch : DEFAULT_GITHUB_CONFIG.branch,
+        path: parsed && parsed.path ? parsed.path : DEFAULT_GITHUB_CONFIG.path,
+        token: parsed && parsed.token ? parsed.token : ""
+      };
+    } catch (error) {
+      return Object.assign({}, DEFAULT_GITHUB_CONFIG);
+    }
+  }
+
+  function saveGitHubConfig(nextConfig) {
+    try {
+      window.localStorage.setItem(GITHUB_SETTINGS_KEY, JSON.stringify(nextConfig));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function buildGitHubApiUrl() {
+    var encodedPath = githubConfig.path.split("/").map(encodeURIComponent).join("/");
+    return "https://api.github.com/repos/" +
+      encodeURIComponent(githubConfig.owner) +
+      "/" +
+      encodeURIComponent(githubConfig.repo) +
+      "/contents/" +
+      encodedPath +
+      "?ref=" +
+      encodeURIComponent(githubConfig.branch);
+  }
+
+  function buildGitHubHeaders(includeJson) {
+    var headers = {
+      Accept: "application/vnd.github+json"
+    };
+
+    if (githubConfig.token) {
+      headers.Authorization = "Bearer " + githubConfig.token;
+    }
+
+    if (includeJson) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
+  }
+
+  function decodeBase64Utf8(base64Value) {
+    var binary = atob(String(base64Value || "").replace(/\n/g, ""));
+    var bytes = Uint8Array.from(binary, function (character) {
+      return character.charCodeAt(0);
+    });
+    return new TextDecoder().decode(bytes);
+  }
+
+  function encodeBase64Utf8(value) {
+    var bytes = new TextEncoder().encode(value);
+    var binary = "";
+    bytes.forEach(function (byte) {
+      binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
+  }
+
+  function loadContentFromGitHub(showStatus) {
+    if (showStatus) {
+      setStatus("statusRepoLoading");
+    }
+
+    return fetch(buildGitHubApiUrl(), {
+      method: "GET",
+      headers: buildGitHubHeaders(false)
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("GitHub GET failed: " + response.status);
+      }
+      return response.json();
+    }).then(function (payload) {
+      contentSha = payload.sha || "";
+      state = normalizeState(JSON.parse(decodeBase64Utf8(payload.content || "")));
+      currentLanguage = state.language || currentLanguage;
+      renderLanguage(currentLanguage);
+
+      editableImages.forEach(function (node) {
+        var key = node.dataset.editorImageKey;
+        node.src = Object.prototype.hasOwnProperty.call(state.images, key) ? state.images[key] : (node.dataset.originalSrc || "");
+      });
+
+      saveState(state);
+
+      if (showStatus) {
+        setStatus("statusRepoLoaded");
+      }
+
+      return true;
+    }).catch(function (error) {
+      console.error(error);
+
+      if (showStatus) {
+        setStatus("statusRepoLoadError");
+      }
+
+      return loadContentFromLocalFile(showStatus);
+    });
+  }
+
+  function loadContentFromLocalFile(showStatus) {
+    return fetch("content.json?ts=" + Date.now(), {
+      method: "GET",
+      cache: "no-store"
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("Local content fetch failed");
+      }
+      return response.json();
+    }).then(function (payload) {
+      state = normalizeState(payload);
+      currentLanguage = state.language || currentLanguage;
+      renderLanguage(currentLanguage);
+
+      editableImages.forEach(function (node) {
+        var key = node.dataset.editorImageKey;
+        node.src = Object.prototype.hasOwnProperty.call(state.images, key) ? state.images[key] : (node.dataset.originalSrc || "");
+      });
+
+      saveState(state);
+
+      if (showStatus) {
+        setStatus("statusRepoLoaded");
+      }
+
+      return true;
+    }).catch(function (error) {
+      console.error(error);
+
+      if (showStatus) {
+        setStatus("statusRepoLoadError");
+      }
+
+      return false;
+    });
+  }
+
+  function ensureRemoteSha() {
+    if (contentSha) {
+      return Promise.resolve(contentSha);
+    }
+
+    return fetch(buildGitHubApiUrl(), {
+      method: "GET",
+      headers: buildGitHubHeaders(false)
+    }).then(function (response) {
+      if (response.status === 404) {
+        return "";
+      }
+      if (!response.ok) {
+        throw new Error("GitHub SHA fetch failed: " + response.status);
+      }
+      return response.json().then(function (payload) {
+        contentSha = payload.sha || "";
+        return contentSha;
+      });
+    });
+  }
+
+  function saveContentToGitHub() {
+    persistState();
+
+    if (!githubConfig.token) {
+      setStatus("statusTokenMissing");
+      return;
+    }
+
+    setStatus("statusRepoSaving");
+
+    ensureRemoteSha().then(function (sha) {
+      var body = {
+        message: "Update landing content",
+        content: encodeBase64Utf8(JSON.stringify(state, null, 2)),
+        branch: githubConfig.branch
+      };
+
+      if (sha) {
+        body.sha = sha;
+      }
+
+      return fetch(buildGitHubApiUrl(), {
+        method: "PUT",
+        headers: buildGitHubHeaders(true),
+        body: JSON.stringify(body)
+      });
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("GitHub PUT failed: " + response.status);
+      }
+      return response.json();
+    }).then(function (payload) {
+      contentSha = payload && payload.content && payload.content.sha ? payload.content.sha : contentSha;
+      setStatus("statusRepoSaved");
+    }).catch(function (error) {
+      console.error(error);
+      setStatus("statusRepoSaveError");
+    });
   }
 
   function setStatus(nextStatusKey) {
