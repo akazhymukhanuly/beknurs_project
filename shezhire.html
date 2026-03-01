@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шежіре семьи</title>
+  <meta name="description" content="Динамическое семейное дерево с ветвями детей, внуков и следующих поколений.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="family-tree.css">
+</head>
+<body class="tree-page">
+  <div class="page-shell">
+    <header class="site-header tree-header">
+      <a class="brand" href="index.html">Семейный архив</a>
+      <div class="header-controls tree-header-controls">
+        <a class="tree-back-link" href="index.html" id="tree-back-link">К биографии</a>
+        <div class="language-switcher" aria-label="Переключение языка">
+          <button class="language-button is-active" type="button" data-tree-lang="ru">RU</button>
+          <button class="language-button" type="button" data-tree-lang="kz">KZ</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="tree-main">
+      <section class="section tree-hero">
+        <div class="tree-hero-copy">
+          <p class="eyebrow" id="tree-eyebrow">Шежіре</p>
+          <h1 id="tree-title">Родословное дерево семьи</h1>
+          <p class="tree-lead" id="tree-lead">
+            Здесь показаны дедушка, бабушка и десять ветвей детей. У каждой ветви можно продолжать потомков дальше:
+            добавлять детей, внуков и следующие поколения через JSON-структуру.
+          </p>
+        </div>
+        <div class="tree-hero-note" id="tree-note">
+          Страница строится автоматически по данным из `family-tree.json`.
+        </div>
+      </section>
+
+      <section class="section tree-dashboard">
+        <div class="tree-stats" id="tree-stats"></div>
+        <div class="tree-tools">
+          <label class="tree-search">
+            <span id="tree-search-label">Поиск по имени</span>
+            <input id="tree-search-input" type="search" placeholder="Введите имя или ветвь">
+          </label>
+          <div class="tree-tool-buttons">
+            <button class="editor-button" type="button" id="tree-expand-all">Раскрыть все</button>
+            <button class="editor-button" type="button" id="tree-collapse-all">Свернуть все</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tree-root-section">
+        <div id="tree-root-card"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading tree-heading">
+          <p class="eyebrow" id="tree-branches-eyebrow">Ветви рода</p>
+          <h2 id="tree-branches-title">Десять линий потомков</h2>
+        </div>
+        <div class="tree-canvas">
+          <div class="tree-empty" id="tree-empty" hidden>Поиск ничего не нашел.</div>
+          <div id="tree-container" class="family-tree"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="family-tree.js"></script>
+</body>
+</html>
