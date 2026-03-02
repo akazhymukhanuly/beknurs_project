@@ -374,6 +374,12 @@
   var githubBranchInput = document.getElementById("github-branch");
   var githubPathInput = document.getElementById("github-path");
   var githubTokenInput = document.getElementById("github-token");
+  var archiveCarousel = document.getElementById("archive-carousel");
+  var archiveSlides = Array.from(document.querySelectorAll("[data-archive-slide]"));
+  var archivePrevButton = document.getElementById("archive-prev");
+  var archiveNextButton = document.getElementById("archive-next");
+  var archiveIndex = 0;
+  var archiveTimer = null;
 
   if (
     !settingsToggle ||
@@ -592,6 +598,7 @@
   setEditMode(false);
   setSettingsOpen(false);
   renderLanguage(currentLanguage);
+  initArchiveCarousel();
   loadContentFromLocalFile(false);
 
   function renderLanguage(language) {
@@ -948,5 +955,93 @@
   function setStatus(nextStatusKey) {
     statusKey = nextStatusKey;
     statusNode.textContent = translate(statusKey);
+  }
+
+  function initArchiveCarousel() {
+    if (!archiveCarousel || archiveSlides.length === 0) {
+      return;
+    }
+
+    updateArchiveCarousel();
+
+    if (archivePrevButton) {
+      archivePrevButton.addEventListener("click", function () {
+        stepArchiveCarousel(-1);
+      });
+    }
+
+    if (archiveNextButton) {
+      archiveNextButton.addEventListener("click", function () {
+        stepArchiveCarousel(1);
+      });
+    }
+
+    archiveCarousel.addEventListener("mouseenter", stopArchiveAutoplay);
+    archiveCarousel.addEventListener("mouseleave", startArchiveAutoplay);
+    archiveCarousel.addEventListener("focusin", stopArchiveAutoplay);
+    archiveCarousel.addEventListener("focusout", startArchiveAutoplay);
+
+    startArchiveAutoplay();
+  }
+
+  function stepArchiveCarousel(direction) {
+    archiveIndex = (archiveIndex + direction + archiveSlides.length) % archiveSlides.length;
+    updateArchiveCarousel();
+    restartArchiveAutoplay();
+  }
+
+  function updateArchiveCarousel() {
+    if (!archiveSlides.length) {
+      return;
+    }
+
+    var prevIndex = (archiveIndex - 1 + archiveSlides.length) % archiveSlides.length;
+    var nextIndex = (archiveIndex + 1) % archiveSlides.length;
+
+    archiveSlides.forEach(function (slide, index) {
+      slide.classList.remove("is-active", "is-prev", "is-next", "is-hidden");
+
+      if (index === archiveIndex) {
+        slide.classList.add("is-active");
+        return;
+      }
+
+      if (index === prevIndex) {
+        slide.classList.add("is-prev");
+        return;
+      }
+
+      if (index === nextIndex) {
+        slide.classList.add("is-next");
+        return;
+      }
+
+      slide.classList.add("is-hidden");
+    });
+  }
+
+  function startArchiveAutoplay() {
+    if (archiveSlides.length < 2 || archiveTimer) {
+      return;
+    }
+
+    archiveTimer = window.setInterval(function () {
+      archiveIndex = (archiveIndex + 1) % archiveSlides.length;
+      updateArchiveCarousel();
+    }, 3800);
+  }
+
+  function stopArchiveAutoplay() {
+    if (!archiveTimer) {
+      return;
+    }
+
+    window.clearInterval(archiveTimer);
+    archiveTimer = null;
+  }
+
+  function restartArchiveAutoplay() {
+    stopArchiveAutoplay();
+    startArchiveAutoplay();
   }
 })();

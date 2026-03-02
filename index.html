@@ -342,8 +342,12 @@
           <h2 data-i18n="archiveTitle">Фотографии и документы из семейной коллекции</h2>
         </div>
 
-        <div class="archive-grid">
-          <figure class="archive-card archive-card-wide">
+        <div class="archive-carousel" id="archive-carousel">
+          <button class="archive-nav archive-nav-prev" type="button" id="archive-prev" aria-label="Previous archive item">
+            &lsaquo;
+          </button>
+          <div class="archive-stage">
+          <figure class="archive-slide" data-archive-slide>
             <img
               src="assets/group-photo.jpeg"
               alt="Групповая фотография у памятника Ленину"
@@ -353,7 +357,7 @@
             <figcaption data-i18n="groupPhotoCaption">Групповой снимок эпохи, сохранивший атмосферу времени.</figcaption>
           </figure>
 
-          <figure class="archive-card">
+          <figure class="archive-slide" data-archive-slide>
             <img
               src="assets/party-school.jpeg"
               alt="Удостоверение об окончании партийной школы"
@@ -363,7 +367,7 @@
             <figcaption data-i18n="partySchoolCaption">Удостоверение об окончании партийной школы в 1952 году.</figcaption>
           </figure>
 
-          <figure class="archive-card">
+          <figure class="archive-slide" data-archive-slide>
             <img
               src="assets/party-card.jpeg"
               alt="Партийный билет"
@@ -373,7 +377,7 @@
             <figcaption data-i18n="partyCardCaption">Партийный билет с указанием 1946 года вступления.</figcaption>
           </figure>
 
-          <figure class="archive-card">
+          <figure class="archive-slide" data-archive-slide>
             <img
               src="assets/portrait-main.jpeg"
               alt="Портрет Бабаша Жукенова в зрелые годы"
@@ -383,7 +387,7 @@
             <figcaption data-i18n="archivePortraitCaption">Портрет, который задает всему архиву личное измерение.</figcaption>
           </figure>
 
-          <figure class="archive-card">
+          <figure class="archive-slide" data-archive-slide>
             <img
               src="assets/doc-early-id.jpeg"
               alt="Старое удостоверение с фотографией"
@@ -392,6 +396,10 @@
             >
             <figcaption data-i18n="earlyIdCaption">Одно из ранних удостоверений, сохранивших подпись и печати.</figcaption>
           </figure>
+          </div>
+          <button class="archive-nav archive-nav-next" type="button" id="archive-next" aria-label="Next archive item">
+            &rsaquo;
+          </button>
         </div>
       </section>
       <section class="section tree-section-home" id="family-tree">
