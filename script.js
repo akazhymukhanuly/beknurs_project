@@ -1121,10 +1121,9 @@
       thumb.classList.toggle("is-active", index === awardsIndex);
     });
 
-    activeThumb.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest"
+    document.getElementById("awards-thumbs").scrollTo({
+      left: Math.max(0, activeThumb.offsetLeft - ((document.getElementById("awards-thumbs").clientWidth - activeThumb.offsetWidth) / 2)),
+      behavior: "smooth"
     });
   }
 
