@@ -379,10 +379,10 @@
   var archiveSlides = Array.from(document.querySelectorAll("[data-archive-slide]"));
   var archivePrevButton = document.getElementById("archive-prev");
   var archiveNextButton = document.getElementById("archive-next");
-  var awardsCarousel = document.getElementById("awards-carousel");
-  var awardsSlides = Array.from(document.querySelectorAll("[data-awards-slide]"));
-  var awardsPrevButton = document.getElementById("awards-prev");
-  var awardsNextButton = document.getElementById("awards-next");
+  var awardsFeatureImage = document.getElementById("awards-feature-image");
+  var awardsThumbs = Array.from(document.querySelectorAll("[data-awards-thumb]"));
+  var awardsIndex = 0;
+  var awardsTimer = null;
   var carousels = [];
 
   if (
@@ -608,12 +608,7 @@
     prevButton: archivePrevButton,
     nextButton: archiveNextButton
   });
-  initCarousel({
-    root: awardsCarousel,
-    slides: awardsSlides,
-    prevButton: awardsPrevButton,
-    nextButton: awardsNextButton
-  });
+  initAwardsGallery();
   loadContentFromLocalFile(false);
 
   function renderLanguage(language) {
@@ -1091,5 +1086,70 @@
   function restartCarouselAutoplay(carouselState) {
     stopCarouselAutoplay(carouselState);
     startCarouselAutoplay(carouselState);
+  }
+
+  function initAwardsGallery() {
+    if (!awardsFeatureImage || awardsThumbs.length === 0) {
+      return;
+    }
+
+    updateAwardsGallery();
+
+    awardsThumbs.forEach(function (thumb, index) {
+      thumb.addEventListener("click", function () {
+        awardsIndex = index;
+        updateAwardsGallery();
+        restartAwardsAutoplay();
+      });
+    });
+
+    awardsFeatureImage.closest(".awards-viewer").addEventListener("mouseenter", stopAwardsAutoplay);
+    awardsFeatureImage.closest(".awards-viewer").addEventListener("mouseleave", startAwardsAutoplay);
+    startAwardsAutoplay();
+  }
+
+  function updateAwardsGallery() {
+    var activeThumb = awardsThumbs[awardsIndex];
+    if (!activeThumb) {
+      return;
+    }
+
+    awardsFeatureImage.src = activeThumb.dataset.awardsThumb;
+    awardsFeatureImage.alt = activeThumb.getAttribute("aria-label") || activeThumb.querySelector("img").alt || "Марапат";
+
+    awardsThumbs.forEach(function (thumb, index) {
+      thumb.classList.toggle("is-active", index === awardsIndex);
+    });
+
+    activeThumb.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest"
+    });
+  }
+
+  function startAwardsAutoplay() {
+    if (awardsThumbs.length < 2 || awardsTimer) {
+      return;
+    }
+
+    awardsTimer = window.setInterval(function () {
+      awardsIndex = (awardsIndex + 1) % awardsThumbs.length;
+      updateAwardsGallery();
+    }, 3200);
+  }
+
+  function stopAwardsAutoplay() {
+    if (!awardsTimer) {
+      return;
+    }
+
+    window.clearInterval(awardsTimer);
+    awardsTimer = null;
+  }
+
+  function restartAwardsAutoplay() {
+    stopAwardsAutoplay();
+    startAwardsAutoplay();
   }
 })();
