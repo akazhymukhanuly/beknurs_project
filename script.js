@@ -378,8 +378,11 @@
   var archiveSlides = Array.from(document.querySelectorAll("[data-archive-slide]"));
   var archivePrevButton = document.getElementById("archive-prev");
   var archiveNextButton = document.getElementById("archive-next");
-  var archiveIndex = 0;
-  var archiveTimer = null;
+  var awardsCarousel = document.getElementById("awards-carousel");
+  var awardsSlides = Array.from(document.querySelectorAll("[data-awards-slide]"));
+  var awardsPrevButton = document.getElementById("awards-prev");
+  var awardsNextButton = document.getElementById("awards-next");
+  var carousels = [];
 
   if (
     !settingsToggle ||
@@ -598,7 +601,18 @@
   setEditMode(false);
   setSettingsOpen(false);
   renderLanguage(currentLanguage);
-  initArchiveCarousel();
+  initCarousel({
+    root: archiveCarousel,
+    slides: archiveSlides,
+    prevButton: archivePrevButton,
+    nextButton: archiveNextButton
+  });
+  initCarousel({
+    root: awardsCarousel,
+    slides: awardsSlides,
+    prevButton: awardsPrevButton,
+    nextButton: awardsNextButton
+  });
   loadContentFromLocalFile(false);
 
   function renderLanguage(language) {
@@ -960,51 +974,69 @@
     statusNode.textContent = translate(statusKey);
   }
 
-  function initArchiveCarousel() {
-    if (!archiveCarousel || archiveSlides.length === 0) {
+  function initCarousel(config) {
+    if (!config.root || config.slides.length === 0) {
       return;
     }
 
-    updateArchiveCarousel();
+    var carouselState = {
+      root: config.root,
+      slides: config.slides,
+      prevButton: config.prevButton,
+      nextButton: config.nextButton,
+      index: 0,
+      timer: null
+    };
 
-    if (archivePrevButton) {
-      archivePrevButton.addEventListener("click", function () {
-        stepArchiveCarousel(-1);
+    carousels.push(carouselState);
+    updateCarousel(carouselState);
+
+    if (carouselState.prevButton) {
+      carouselState.prevButton.addEventListener("click", function () {
+        stepCarousel(carouselState, -1);
       });
     }
 
-    if (archiveNextButton) {
-      archiveNextButton.addEventListener("click", function () {
-        stepArchiveCarousel(1);
+    if (carouselState.nextButton) {
+      carouselState.nextButton.addEventListener("click", function () {
+        stepCarousel(carouselState, 1);
       });
     }
 
-    archiveCarousel.addEventListener("mouseenter", stopArchiveAutoplay);
-    archiveCarousel.addEventListener("mouseleave", startArchiveAutoplay);
-    archiveCarousel.addEventListener("focusin", stopArchiveAutoplay);
-    archiveCarousel.addEventListener("focusout", startArchiveAutoplay);
+    carouselState.root.addEventListener("mouseenter", function () {
+      stopCarouselAutoplay(carouselState);
+    });
+    carouselState.root.addEventListener("mouseleave", function () {
+      startCarouselAutoplay(carouselState);
+    });
+    carouselState.root.addEventListener("focusin", function () {
+      stopCarouselAutoplay(carouselState);
+    });
+    carouselState.root.addEventListener("focusout", function () {
+      startCarouselAutoplay(carouselState);
+    });
 
-    startArchiveAutoplay();
+    startCarouselAutoplay(carouselState);
   }
 
-  function stepArchiveCarousel(direction) {
-    archiveIndex = (archiveIndex + direction + archiveSlides.length) % archiveSlides.length;
-    updateArchiveCarousel();
-    restartArchiveAutoplay();
+  function stepCarousel(carouselState, direction) {
+    carouselState.index = (carouselState.index + direction + carouselState.slides.length) % carouselState.slides.length;
+    updateCarousel(carouselState);
+    restartCarouselAutoplay(carouselState);
   }
 
-  function updateArchiveCarousel() {
-    if (!archiveSlides.length) {
+  function updateCarousel(carouselState) {
+    if (!carouselState.slides.length) {
       return;
     }
 
-    var prevIndex = (archiveIndex - 1 + archiveSlides.length) % archiveSlides.length;
-    var nextIndex = (archiveIndex + 1) % archiveSlides.length;
+    var prevIndex = (carouselState.index - 1 + carouselState.slides.length) % carouselState.slides.length;
+    var nextIndex = (carouselState.index + 1) % carouselState.slides.length;
 
-    archiveSlides.forEach(function (slide, index) {
+    carouselState.slides.forEach(function (slide, index) {
       slide.classList.remove("is-active", "is-prev", "is-next", "is-hidden");
 
-      if (index === archiveIndex) {
+      if (index === carouselState.index) {
         slide.classList.add("is-active");
         return;
       }
@@ -1023,28 +1055,28 @@
     });
   }
 
-  function startArchiveAutoplay() {
-    if (archiveSlides.length < 2 || archiveTimer) {
+  function startCarouselAutoplay(carouselState) {
+    if (carouselState.slides.length < 2 || carouselState.timer) {
       return;
     }
 
-    archiveTimer = window.setInterval(function () {
-      archiveIndex = (archiveIndex + 1) % archiveSlides.length;
-      updateArchiveCarousel();
+    carouselState.timer = window.setInterval(function () {
+      carouselState.index = (carouselState.index + 1) % carouselState.slides.length;
+      updateCarousel(carouselState);
     }, 3800);
   }
 
-  function stopArchiveAutoplay() {
-    if (!archiveTimer) {
+  function stopCarouselAutoplay(carouselState) {
+    if (!carouselState.timer) {
       return;
     }
 
-    window.clearInterval(archiveTimer);
-    archiveTimer = null;
+    window.clearInterval(carouselState.timer);
+    carouselState.timer = null;
   }
 
-  function restartArchiveAutoplay() {
-    stopArchiveAutoplay();
-    startArchiveAutoplay();
+  function restartCarouselAutoplay(carouselState) {
+    stopCarouselAutoplay(carouselState);
+    startCarouselAutoplay(carouselState);
   }
 })();

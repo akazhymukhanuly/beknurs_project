@@ -567,25 +567,21 @@ dd {
   object-fit: cover;
 }
 
-.awards-gallery {
+.awards-carousel {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
   gap: 1rem;
-  margin-top: 1rem;
 }
 
-.awards-gallery-card {
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid rgba(96, 29, 21, 0.12);
-  border-radius: 1.2rem;
-  background: var(--paper);
-  box-shadow: 0 10px 30px rgba(45, 26, 18, 0.08);
+.awards-stage {
+  min-height: 34rem;
 }
 
-.awards-gallery-card img {
+.awards-slide img {
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
+  background: rgba(255, 252, 246, 0.96);
 }
 
 .archive-carousel {
@@ -746,8 +742,8 @@ body.edit-mode [data-editor-image="true"]:hover {
     grid-template-columns: 1fr;
   }
 
-  .awards-gallery {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .awards-carousel {
+    grid-template-columns: 1fr;
   }
 
   .archive-carousel {
@@ -851,8 +847,8 @@ body.edit-mode [data-editor-image="true"]:hover {
     width: min(100%, 22rem);
   }
 
-  .awards-gallery {
-    grid-template-columns: 1fr;
+  .awards-stage {
+    min-height: 26rem;
   }
 
   .archive-slide.is-prev {
