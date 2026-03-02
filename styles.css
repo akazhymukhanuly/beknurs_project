@@ -503,33 +503,6 @@ dd {
   border-radius: 1.5rem;
 }
 
-.about-photo-card {
-  overflow: hidden;
-  margin: 0;
-  border: 1px solid rgba(96, 29, 21, 0.12);
-  border-radius: 1.6rem;
-  background: rgba(255, 252, 246, 0.96);
-  box-shadow: 0 10px 30px rgba(45, 26, 18, 0.08);
-}
-
-.about-photo-card img {
-  display: block;
-  width: 100%;
-  max-height: 34rem;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.about-photo-card figcaption {
-  padding: 0.95rem 1.1rem 1.1rem;
-  color: var(--muted);
-  font-size: 0.98rem;
-}
-
-.awards-showcase > .about-photo-card,
-.archive-section > .about-photo-card {
-  display: none;
-}
 
 .memory-strip {
   display: grid;
