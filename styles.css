@@ -851,7 +851,11 @@ body.edit-mode [data-editor-image="true"]:hover {
   }
 
   .archive-nav {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: static;
+    margin: 0.35rem auto 0;
   }
 
   .editor-toolbar {
@@ -937,6 +941,10 @@ body.edit-mode [data-editor-image="true"]:hover {
 
   .archive-stage {
     min-height: 29rem;
+  }
+
+  .archive-carousel {
+    gap: 0.75rem;
   }
 
   .archive-slide {
