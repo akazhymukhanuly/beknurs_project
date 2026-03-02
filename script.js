@@ -1,5 +1,6 @@
 (function () {
-  var STORAGE_KEY = "grandpa-landing-editor-v4";
+  var STORAGE_KEY = "grandpa-landing-editor-v5";
+  var IMAGE_SCHEMA_VERSION = "v2";
   var GITHUB_SETTINGS_KEY = "grandpa-landing-github-settings-v1";
   var DEFAULT_GITHUB_CONFIG = {
     owner: "akazhymukhanuly",
@@ -689,6 +690,7 @@
 
   function normalizeState(rawState) {
     var normalizedTexts = { ru: {}, kz: {} };
+    var normalizedImages = {};
 
     if (rawState && rawState.texts && typeof rawState.texts === "object") {
       if (rawState.texts.ru || rawState.texts.kz) {
@@ -699,10 +701,20 @@
       }
     }
 
+    if (
+      rawState &&
+      rawState.imageSchemaVersion === IMAGE_SCHEMA_VERSION &&
+      rawState.images &&
+      typeof rawState.images === "object"
+    ) {
+      normalizedImages = rawState.images;
+    }
+
     return {
       language: rawState && rawState.language && translations[rawState.language] ? rawState.language : DEFAULT_LANGUAGE,
       texts: normalizedTexts,
-      images: rawState && rawState.images && typeof rawState.images === "object" ? rawState.images : {}
+      images: normalizedImages,
+      imageSchemaVersion: IMAGE_SCHEMA_VERSION
     };
   }
 
@@ -733,6 +745,7 @@
     });
 
     state.language = currentLanguage;
+    state.imageSchemaVersion = IMAGE_SCHEMA_VERSION;
     saveState(state);
   }
 
