@@ -452,10 +452,11 @@ dd {
 
 .portrait-main img {
   width: 100%;
-  aspect-ratio: 0.72;
+  aspect-ratio: 720 / 1520;
   max-height: 42rem;
-  object-fit: contain;
-  background: #efe6d8;
+  object-fit: cover;
+  object-position: center;
+  background: transparent;
 }
 
 .portrait-note {
